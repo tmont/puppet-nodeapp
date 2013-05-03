@@ -15,7 +15,7 @@ to download it manually since it's not on the Puppet Forge.
 ```puppet
 nodeapp::instance { 'my-sweet-node-app':
 	# required: the script to run to start your application
-	entry_point => 'app.js',
+	entry_point => '/path/to/app.js',
 
 	# required: the directory to store the logs
 	# note that you are responsible for making sure this directory exists
