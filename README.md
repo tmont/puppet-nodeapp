@@ -8,7 +8,7 @@ This is a puppet module for configuring a NodeJS application. It does the follow
 Only supports Ubuntu, and whatever else uses upstart for its service configuration.
 
 ## Dependencies
-This module depends on the [Upstart module](https://github.com/bison/upstart). You'll need
+This module depends on the [Upstart module](https://github.com/bison/puppet-upstart). You'll need
 to download it manually since it's not on the Puppet Forge.
 
 ## Usage
