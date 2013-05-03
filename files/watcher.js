@@ -29,7 +29,6 @@ config.locations.forEach(function(location) {
 	});
 });
 
-// This function deals with our primary restart function
 function restart() {
 	if (restarting) {
 		console.log('Skipping...');
@@ -66,9 +65,10 @@ function restart() {
 		exec(action + ' ' + service, function(err, stdout, stderr) {
 			if (err) {
 				console.error(('Unable to execute service action: ' + service + ' ' + action).red);
+			} else {
+				console.log('Service ' + service + ' ' + action + 'ed...');
 			}
 
-			console.log('Service ' + service + ' ' + action + 'ed...');
 			callback(err, stdout, stderr);
 		});
 	}
