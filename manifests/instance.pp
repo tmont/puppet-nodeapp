@@ -4,15 +4,21 @@ define nodeapp::instance (
   $npm_install_dir = undef,
   $app_name = $name,
   $node_path = undef,
-  $watch_config_file = undef
+  $watch_config_file = undef,
+  $time_zone = undef
 ) {
   include upstart
   include nodeapp
 
   $log_file = "${log_dir}/${app_name}.log"
-  $export = $node_path ? {
+  $node_path_cmd = $node_path ? {
     undef => '',
     default => "export NODE_PATH=${node_path} &&"
+  }
+
+  $time_zone_cmd = $time_zone ? {
+    undef => '',
+    default => "export TZ=${time_zone} &&"
   }
 
   file { $log_file:
@@ -33,7 +39,7 @@ define nodeapp::instance (
     description => "Node app for ${app_name}",
     respawn => true,
     respawn_limit => '10 5',
-    script => "${export} node ${entry_point} >> ${log_file} 2>> ${log_file}\n"
+    script => "${node_path_cmd}${time_zone_cmd}node ${entry_point} >> ${log_file} 2>> ${log_file}\n"
   }
 
   if $watch_config_file != undef {

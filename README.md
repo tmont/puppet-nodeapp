@@ -30,6 +30,11 @@ nodeapp::instance { 'my-sweet-node-app':
 	# optional: sets the NODE_PATH environment variable
 	node_path => '/path/to/node/stuff:/another/one',
 
+	# optional: sets the TZ environment variable
+	# use Europe/London for UTC
+	# defaults to local time
+  time_zone => 'Europe/London',
+
 	# optional: if given, will set up a watch service that detects changes
 	# to the app and restarts the service automatically
 	watch_config_file => '/path/to/watcher-config.js'
