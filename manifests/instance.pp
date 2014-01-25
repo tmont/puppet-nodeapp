@@ -29,7 +29,7 @@ define nodeapp::instance (
 
   if $npm_install_dir != undef {
     exec { "${app_name}-node-modules":
-      command => "npm install ${npm_install_dir} --unsafe-perm",
+      command => "npm install ${npm_install_dir} --unsafe-perm --production",
       cwd => $npm_install_dir,
       before => Upstart::Job[$app_name],
     }
