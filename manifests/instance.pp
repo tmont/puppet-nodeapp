@@ -13,12 +13,12 @@ define nodeapp::instance (
   $log_file = "${log_dir}/${app_name}.log"
   $node_path_cmd = $node_path ? {
     undef => '',
-    default => "export NODE_PATH=${node_path} &&"
+    default => "export NODE_PATH=${node_path} && "
   }
 
   $time_zone_cmd = $time_zone ? {
     undef => '',
-    default => "export TZ=${time_zone} &&"
+    default => "export TZ=${time_zone} && "
   }
 
   file { $log_file:
