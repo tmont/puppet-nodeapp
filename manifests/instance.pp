@@ -5,7 +5,8 @@ define nodeapp::instance (
   $app_name = $name,
   $node_path = undef,
   $watch_config_file = undef,
-  $time_zone = undef
+  $time_zone = undef,
+  $npm_install_args = '--unsafe-perm'
 ) {
   include upstart
   include nodeapp
@@ -28,8 +29,9 @@ define nodeapp::instance (
   }
 
   if $npm_install_dir != undef {
+
     exec { "${app_name}-node-modules":
-      command => "npm install ${npm_install_dir} --unsafe-perm --production",
+      command => "npm install ${npm_install_dir} ${npm_install_args}",
       cwd => $npm_install_dir,
       before => Upstart::Job[$app_name],
     }

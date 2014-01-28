@@ -33,11 +33,16 @@ nodeapp::instance { 'my-sweet-node-app':
 	# optional: sets the TZ environment variable
 	# use Europe/London for UTC
 	# defaults to local time
-  time_zone => 'Europe/London',
+	time_zone => 'Europe/London',
 
 	# optional: if given, will set up a watch service that detects changes
 	# to the app and restarts the service automatically
-	watch_config_file => '/path/to/watcher-config.js'
+	watch_config_file => '/path/to/watcher-config.js'.
+
+	# optional: arguments to pass to npm install command;
+	# only relevant if npm_install_dir is set
+	# defaults to "--unsafe-perm"
+	npm_install_args => '--unsafe-perm'
 }
 ```
 
