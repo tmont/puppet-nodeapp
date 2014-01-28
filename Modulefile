@@ -1,5 +1,5 @@
 name 'tmont-nodeapp'
-version '0.1.1'
+version '0.2.0'
 summary 'Puppet module for creating node applications'
 description 'Provisions a node application with upstart and configures logging and watching'
 project_page 'https://github.com/tmont/puppet-nodeapp'
