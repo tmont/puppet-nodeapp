@@ -17,7 +17,7 @@ nodeapp::instance { 'my-sweet-node-app':
 	# required: the script to run to start your application
 	entry_point => '/path/to/app.js',
 
-	# required: the directory to store the logs
+	# optional: the directory to store the logs
 	# note that you are responsible for making sure this directory exists
 	log_dir => '/path/to/logs',
 
@@ -42,7 +42,14 @@ nodeapp::instance { 'my-sweet-node-app':
 	# optional: arguments to pass to npm install command;
 	# only relevant if npm_install_dir is set
 	# defaults to "--unsafe-perm"
-	npm_install_args => '--unsafe-perm'
+	npm_install_args => '--unsafe-perm',
+
+	# specify a user/group for the upstart job
+	user => undef,
+	group => undef,
+
+	# whether to redirect console output to the log file
+	redirect_logs => true,
 }
 ```
 

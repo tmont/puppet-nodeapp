@@ -1,17 +1,19 @@
 define nodeapp::instance (
   $entry_point,
-  $log_dir,
+  $log_dir = undef,
   $npm_install_dir = undef,
   $app_name = $name,
   $node_path = undef,
   $watch_config_file = undef,
   $time_zone = undef,
+  $user = undef,
+  $group = undef,
+  $redirect_logs = true,
   $npm_install_args = '--unsafe-perm'
 ) {
   include upstart
   include nodeapp
 
-  $log_file = "${log_dir}/${app_name}.log"
   $node_path_cmd = $node_path ? {
     undef => '',
     default => "export NODE_PATH=${node_path} && "
@@ -22,14 +24,17 @@ define nodeapp::instance (
     default => "export TZ=${time_zone} && "
   }
 
-  file { $log_file:
-    ensure => file,
-    mode => 0644,
-    require => File[$log_dir],
+  if $log_dir != undef {
+    $log_file = "${log_dir}/${app_name}.log"
+    file { $log_file:
+      ensure => file,
+      mode => 0644,
+      require => File[$log_dir],
+      before => Upstart::Job[$app_name]
+    }
   }
 
   if $npm_install_dir != undef {
-
     exec { "${app_name}-node-modules":
       command => "npm install ${npm_install_dir} ${npm_install_args}",
       cwd => $npm_install_dir,
@@ -37,11 +42,35 @@ define nodeapp::instance (
     }
   }
 
+  if $user != undef and $group != undef {
+    group { $group:
+      ensure => present,
+      system => true,
+    }
+
+    user { $user:
+      ensure => present,
+      gid => $group,
+      system => true,
+      shell => '/bin/false',
+      require => Group[$group],
+      before => Upstart::Job[$app_name]
+    }
+  }
+
+  if $redirect_logs == true and $log_dir != undef {
+    $log_redirects = ">> ${log_file} 2>> ${log_file}"
+  } else {
+    $log_redirects = ""
+  }
+
   upstart::job { $app_name:
     description => "Node app for ${app_name}",
     respawn => true,
     respawn_limit => '10 5',
-    script => "${node_path_cmd}${time_zone_cmd}node ${entry_point} >> ${log_file} 2>> ${log_file}\n"
+    user => $user,
+    group => $group,
+    script => "${node_path_cmd}${time_zone_cmd}node ${entry_point} ${log_redirects}\n"
   }
 
   if $watch_config_file != undef {
