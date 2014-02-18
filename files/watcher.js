@@ -37,29 +37,47 @@ function restart() {
 
 	restarting = true;
 
-	async.forEachSeries(config.services, function(service, next) {
-		doServiceAction(service, 'status', function(err, stdout, stderr) {
+	if (config.preRestart) {
+		exec(config.preRestart, function(err, stdout, stderr) {
 			if (err) {
-				console.error(('Unable to get status for service: ' + service).red);
-				next(err);
+				console.error('Failed to execute pre-restart command'.red);
+				console.error(stdout.red);
+				console.error(stderr.red);
+				process.exit(1);
 				return;
 			}
 
-			// Is the service stopped?
-			if (stdout.toString().indexOf(service + ' stop/waiting') === 0) {
-				doServiceAction(service, 'start', next);
-			} else if (stdout.toString().indexOf(service + ' start/running') === 0) {
-				doServiceAction(service, 'restart', next);
-			}
+			doRestart();
 		});
-	}, function(err) {
-		if (err) {
-			console.error('Unknown state, exiting!');
-			throw err;
-		}
+	} else {
+		doRestart();
+	}
 
-		restarting = false;
-	});
+	function doRestart() {
+		async.forEachSeries(config.services, function(service, next) {
+			doServiceAction(service, 'status', function(err, stdout, stderr) {
+				if (err) {
+					console.error(('Unable to get status for service: ' + service).red);
+					next(err);
+					return;
+				}
+
+				// Is the service stopped?
+				if (stdout.toString().indexOf(service + ' stop/waiting') === 0) {
+					doServiceAction(service, 'start', next);
+				} else if (stdout.toString().indexOf(service + ' start/running') === 0) {
+					doServiceAction(service, 'restart', next);
+				}
+			});
+		}, function(err) {
+			if (err) {
+				console.error('Unknown state, exiting!');
+				throw err;
+			}
+
+			restarting = false;
+		});
+	}
 
 	function doServiceAction(service, action, callback) {
 		exec(action + ' ' + service, function(err, stdout, stderr) {
