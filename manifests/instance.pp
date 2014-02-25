@@ -39,6 +39,7 @@ define nodeapp::instance (
       command => "npm install ${npm_install_dir} ${npm_install_args}",
       cwd => $npm_install_dir,
       before => Upstart::Job[$app_name],
+      notify => Service[$app_name]
     }
   }
 
