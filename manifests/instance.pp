@@ -49,7 +49,6 @@ define nodeapp::instance (
     respawn_limit => '10 5',
     user => $user,
     group => $group,
-    require => User[$user],
     script => "${node_path_cmd}${time_zone_cmd}node ${entry_point} ${log_redirects}\n"
   }
 
