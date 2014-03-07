@@ -1,14 +1,13 @@
 define nodeapp::instance (
   $entry_point,
+  $user,
+  $group,
   $log_dir = undef,
   $npm_install_dir = undef,
   $app_name = $name,
   $node_path = undef,
   $watch_config_file = undef,
   $time_zone = undef,
-  $user = undef,
-  $group = undef,
-  $redirect_logs = true,
   $npm_install_args = '--unsafe-perm'
 ) {
   include upstart
@@ -26,10 +25,11 @@ define nodeapp::instance (
 
   if $log_dir != undef {
     $log_file = "${log_dir}/${app_name}.log"
+    $log_redirects = ">> ${log_file} 2>> ${log_file}"
     file { $log_file:
       ensure => file,
       mode => 0644,
-      require => File[$log_dir],
+      owner => $user,
       before => Upstart::Job[$app_name]
     }
   }
@@ -43,34 +43,13 @@ define nodeapp::instance (
     }
   }
 
-  if $user != undef and $group != undef {
-    group { $group:
-      ensure => present,
-      system => true,
-    }
-
-    user { $user:
-      ensure => present,
-      gid => $group,
-      system => true,
-      shell => '/bin/false',
-      require => Group[$group],
-      before => Upstart::Job[$app_name]
-    }
-  }
-
-  if $redirect_logs == true and $log_dir != undef {
-    $log_redirects = ">> ${log_file} 2>> ${log_file}"
-  } else {
-    $log_redirects = ""
-  }
-
   upstart::job { $app_name:
     description => "Node app for ${app_name}",
     respawn => true,
     respawn_limit => '10 5',
     user => $user,
     group => $group,
+    require => User[$user],
     script => "${node_path_cmd}${time_zone_cmd}node ${entry_point} ${log_redirects}\n"
   }
 
@@ -99,6 +78,8 @@ define nodeapp::instance (
 
     nodeapp::instance { $watch_service:
       entry_point => "${watch_script} ${watch_config_file}",
+      user => $user,
+      group => $group,
       log_dir => $log_dir,
       npm_install_dir => $app_watcher_dir,
       require => [ File[$watch_script], File[$package_json] ],
