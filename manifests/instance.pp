@@ -77,8 +77,8 @@ define nodeapp::instance (
 
     nodeapp::instance { $watch_service:
       entry_point => "${watch_script} ${watch_config_file}",
-      user => $user,
-      group => $group,
+      user => 'root',
+      group => 'root',
       log_dir => $log_dir,
       npm_install_dir => $app_watcher_dir,
       require => [ File[$watch_script], File[$package_json] ],
