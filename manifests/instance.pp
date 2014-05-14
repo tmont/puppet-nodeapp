@@ -37,6 +37,7 @@ define nodeapp::instance (
   if $npm_install_dir != undef {
     exec { "${app_name}-node-modules":
       command => "npm install ${npm_install_dir} ${npm_install_args}",
+      environment => [ 'HOME=/opt/node' ],
       cwd => $npm_install_dir,
       before => Upstart::Job[$app_name],
       notify => Service[$app_name]
